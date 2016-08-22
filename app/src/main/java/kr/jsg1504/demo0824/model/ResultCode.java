@@ -11,7 +11,8 @@ public enum ResultCode {
   SUCCESS("00"),
   FAIL("99"),
   RUNNING("01"),
-  STOP("02");
+  STOP("02"),
+  WAIT("9999");
 
   private String value;
 
@@ -37,6 +38,9 @@ public enum ResultCode {
       }
       else if ("02".equals(value)) {
         resultCode = STOP;
+      }
+      else if ("9999".equals(value)) {
+        resultCode = WAIT;
       }
     }
     return resultCode;

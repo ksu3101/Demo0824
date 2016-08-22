@@ -28,7 +28,7 @@ public class MainActiviyPresenter
     this.view = viewImplInstance;
   }
 
-  public void retrieveServerState(@NonNull String id) {
+  public void retrieveServerState(@NonNull final String id) {
     SwObservable observable = new SwObservable(
         this,
         RetrofitAdapter.getInstance()
@@ -45,14 +45,14 @@ public class MainActiviyPresenter
           @Override
           public void onError(Throwable e) {
             if (view != null) {
-              view.onError(TAG, e.getMessage());
+              view.onError(id, e.getMessage());
             }
           }
 
           @Override
           public void onNext(ResponseBody responseBody) {
             if (view != null) {
-              view.onResultRetrieveServerState(parseResultCode(responseBody));
+              view.onResultRetrieveServerState(id, parseResultCode(responseBody));
             }
             onCompleted();
           }
@@ -60,7 +60,7 @@ public class MainActiviyPresenter
     );
   }
 
-  public void sendStartSignalToServer(@NonNull String id) {
+  public void sendStartSignalToServer(@NonNull final String id) {
     SwObservable observable = new SwObservable(
         this,
         RetrofitAdapter.getInstance()
@@ -77,14 +77,14 @@ public class MainActiviyPresenter
           @Override
           public void onError(Throwable e) {
             if (view != null) {
-              view.onError(TAG, e.getMessage());
+              view.onError(id, e.getMessage());
             }
           }
 
           @Override
           public void onNext(ResponseBody responseBody) {
             if (view != null) {
-              view.sendStartSignalCompleted(parseResultCode(responseBody));
+              view.sendStartSignalCompleted(id, parseResultCode(responseBody));
             }
             onCompleted();
           }
@@ -92,7 +92,7 @@ public class MainActiviyPresenter
     );
   }
 
-  public void sendStopSignalToServer(@NonNull String id) {
+  public void sendStopSignalToServer(@NonNull final String id) {
     SwObservable observable = new SwObservable(
         this,
         RetrofitAdapter.getInstance()
@@ -109,14 +109,14 @@ public class MainActiviyPresenter
           @Override
           public void onError(Throwable e) {
             if (view != null) {
-              view.onError(TAG, e.getMessage());
+              view.onError(id, e.getMessage());
             }
           }
 
           @Override
           public void onNext(ResponseBody responseBody) {
             if (view != null) {
-              view.sendStopSignalCompleted(parseResultCode(responseBody));
+              view.sendStopSignalCompleted(id, parseResultCode(responseBody));
             }
             onCompleted();
           }
@@ -143,11 +143,11 @@ public class MainActiviyPresenter
 
   public interface View
       extends BaseView {
-    void onResultRetrieveServerState(@NonNull ResultCode resultCode);
+    void onResultRetrieveServerState(@NonNull String sId, @NonNull ResultCode resultCode);
 
-    void sendStartSignalCompleted(@NonNull ResultCode resultCode);
+    void sendStartSignalCompleted(@NonNull String sId, @NonNull ResultCode resultCode);
 
-    void sendStopSignalCompleted(@NonNull ResultCode resultCode);
+    void sendStopSignalCompleted(@NonNull String sId, @NonNull ResultCode resultCode);
   }
 
 }

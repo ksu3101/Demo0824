@@ -1,10 +1,13 @@
 <resources>
    <string name="app_name">Demo0824</string>
 
+   <string name="sid1">SERVER 1</string>
+   <string name="sid2">SERVER 2</string>
+
    <string name="running_to_stop">Stop</string>
    <string name="stop_to_start">Start</string>
    <string name="get_server_state">retry to get Server states.</string>
    <string name="retrieve_server_state">get server state..</string>
-   <string name="send_signal">wait on response</string>
+   <string name="send_signal">wait for response..</string>
 
 </resources>

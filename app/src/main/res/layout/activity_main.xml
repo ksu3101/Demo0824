@@ -1,41 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
    xmlns:android="http://schemas.android.com/apk/res/android"
    android:layout_width="match_parent"
    android:layout_height="match_parent"
-   android:background="@drawable/bg_def1">
+   android:background="@drawable/bg_def1"
+   android:orientation="vertical">
 
-   <Button
-      android:id="@+id/main_btn_signal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_centerInParent="true"
-      android:layout_marginLeft="24dp"
-      android:layout_marginRight="24dp"
-      android:background="@drawable/btn_c_white"
-      android:ellipsize="end"
-      android:maxLines="1"
-      android:textColor="@drawable/btn_c_white_text"
-      android:textSize="14sp"/>
-
-   <ProgressBar
-      android:id="@+id/main_pb"
-      style="@style/Widget.AppCompat.ProgressBar"
+   <ImageView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_above="@id/main_btn_signal"
       android:layout_centerHorizontal="true"
-      android:layout_marginBottom="24dp"
-      android:visibility="invisible"/>
+      android:layout_gravity="center_horizontal"
+      android:layout_marginBottom="62dp"
+      android:layout_marginTop="48dp"
+      android:src="@drawable/logo_img"/>
+
+   <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="72dp"
+      android:layout_marginBottom="18dp">
+
+      <ProgressBar
+         android:id="@+id/main_pb_s1"
+         style="@style/Widget.AppCompat.ProgressBar"
+         android:layout_width="48dp"
+         android:layout_height="48dp"
+         android:layout_alignParentBottom="true"
+         android:layout_marginLeft="40dp"
+         android:padding="12dp"
+         android:visibility="visible"/>
+
+      <Button
+         android:id="@+id/main_btn_s1_signal"
+         android:layout_width="match_parent"
+         android:layout_height="48dp"
+         android:layout_alignParentBottom="true"
+         android:layout_marginLeft="24dp"
+         android:layout_marginRight="24dp"
+         android:background="@drawable/btn_c_white"
+         android:ellipsize="end"
+         android:enabled="false"
+         android:maxLines="1"
+         android:minHeight="0dp"
+         android:minWidth="0dp"
+         android:text="@string/send_signal"
+         android:textColor="@drawable/btn_c_white_text"
+         android:textSize="14sp"/>
+
+      <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@id/main_btn_s1_signal"
+         android:layout_marginBottom="4dp"
+         android:layout_marginLeft="24dp"
+         android:maxLines="1"
+         android:text="@string/sid1"
+         android:textColor="@color/transparent_heavy_white"
+         android:textSize="12sp"/>
+
+   </RelativeLayout>
+
+   <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="72dp">
+
+      <ProgressBar
+         android:id="@+id/main_pb_s2"
+         style="@style/Widget.AppCompat.ProgressBar"
+         android:layout_width="48dp"
+         android:layout_height="48dp"
+         android:layout_alignParentBottom="true"
+         android:layout_marginLeft="40dp"
+         android:padding="12dp"
+         android:visibility="visible"/>
+
+      <Button
+         android:id="@+id/main_btn_s2_signal"
+         android:layout_width="match_parent"
+         android:layout_height="48dp"
+         android:layout_alignParentBottom="true"
+         android:layout_marginLeft="24dp"
+         android:layout_marginRight="24dp"
+         android:background="@drawable/btn_c_white"
+         android:ellipsize="end"
+         android:enabled="false"
+         android:maxLines="1"
+         android:minHeight="0dp"
+         android:minWidth="0dp"
+         android:text="@string/send_signal"
+         android:textColor="@drawable/btn_c_white_text"
+         android:textSize="14sp"/>
+
+      <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_above="@id/main_btn_s2_signal"
+         android:layout_marginBottom="4dp"
+         android:layout_marginLeft="24dp"
+         android:maxLines="1"
+         android:text="@string/sid2"
+         android:textColor="@color/transparent_heavy_white"
+         android:textSize="12sp"/>
+
+   </RelativeLayout>
 
    <TextView
       android:id="@+id/main_tv_state"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@id/main_btn_signal"
+      android:layout_height="0dp"
+      android:layout_weight="1"
       android:ellipsize="end"
       android:lineSpacingExtra="2dp"
-      android:padding="24dp"
+      android:paddingLeft="24dp"
+      android:paddingRight="24dp"
+      android:paddingTop="24dp"
+      android:scrollbars="vertical"
       android:textColor="@color/transparent_heavy_white"/>
 
-</RelativeLayout>
+</LinearLayout>

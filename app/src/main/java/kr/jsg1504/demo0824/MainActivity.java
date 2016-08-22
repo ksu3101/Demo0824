@@ -1,35 +1,44 @@
 package kr.jsg1504.demo0824;
 
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import kr.jsg1504.demo0824.model.ResultCode;
 import kr.jsg1504.demo0824.model.ServerState;
+import kr.jsg1504.demo0824.utils.Utils;
 import kr.jsg1504.demo0824.utils.common.BaseActivity;
 import kr.jsg1504.demo0824.utils.mvp.BasePresenter;
 
 public class MainActivity
     extends BaseActivity
     implements MainActiviyPresenter.View {
-  private static final String TAG       = MainActivity.class.getSimpleName();
-  private static final String SERVER_ID = "1";
+  private static final String TAG   = MainActivity.class.getSimpleName();
+  private static final String SID_1 = "1";
+  private static final String SID_2 = "2";
 
   private MainActiviyPresenter presenter;
-  private ServerState          serverState;
 
-  @BindView(R.id.main_btn_signal)
-  Button      btnSignals;
-  @BindView(R.id.main_pb)
-  ProgressBar progressBar;
+  private ServerState s1State;
+  private ServerState s2State;
+
+  @BindView(R.id.main_btn_s1_signal)
+  Button      btnS1Signal;
+  @BindView(R.id.main_btn_s2_signal)
+  Button      btnS2Signal;
+  @BindView(R.id.main_pb_s1)
+  ProgressBar pbS1;
+  @BindView(R.id.main_pb_s2)
+  ProgressBar pbS2;
   @BindView(R.id.main_tv_state)
   TextView    tvState;
 
@@ -45,104 +54,120 @@ public class MainActivity
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
 
-    serverState = ServerState.DISABLED;
+    s1State = ServerState.DISABLED;
+    s2State = ServerState.DISABLED;
 
-    btnSignals.setEnabled(false);
-    btnSignals.setText(getString(R.string.retrieve_server_state));
-    presenter.retrieveServerState(SERVER_ID);
+    presenter.retrieveServerState(SID_1);
+    presenter.retrieveServerState(SID_2);
 
   }
 
-  @OnClick(R.id.main_btn_signal)
+  @OnClick({R.id.main_btn_s1_signal, R.id.main_btn_s2_signal})
   public void onClick(View v) {
-    v.setEnabled(false);
-    progressBar.setVisibility(View.VISIBLE);
-    if (v instanceof Button) {
-      Button tv = (Button) v;
-      if (serverState == ServerState.RUNNING) {
-        // send stop signal to server.
-        presenter.sendStopSignalToServer(SERVER_ID);
-        tv.setText(getString(R.string.send_signal));
+    if (v.getId() == R.id.main_btn_s1_signal) {
+      if (s1State == ServerState.RUNNING) {
+        presenter.sendStopSignalToServer(SID_1);
       }
-      else if (serverState == ServerState.STOP) {
-        // send start signal to server.
-        presenter.sendStartSignalToServer(SERVER_ID);
-        tv.setText(getString(R.string.send_signal));
+      else if (s1State == ServerState.STOP) {
+        presenter.sendStartSignalToServer(SID_1);
       }
       else {
-        // re try to get ServerState.
-        presenter.retrieveServerState(SERVER_ID);
-        tv.setText(getString(R.string.retrieve_server_state));
+        presenter.retrieveServerState(SID_1);
+      }
+      setButtonsLayouts(SID_1, s1State, false, ResultCode.WAIT);
+    }
+    else if (v.getId() == R.id.main_btn_s2_signal) {
+      if (s2State == ServerState.RUNNING) {
+        presenter.sendStopSignalToServer(SID_2);
+      }
+      else if (s2State == ServerState.STOP) {
+        presenter.sendStartSignalToServer(SID_2);
+      }
+      else {
+        presenter.retrieveServerState(SID_2);
+      }
+      setButtonsLayouts(SID_2, s2State, false, ResultCode.WAIT);
+    }
+  }
+
+  private void setButtonsLayouts(@NonNull String sId,
+                                 @NonNull ServerState state,
+                                 boolean isResponse,
+                                 @NonNull ResultCode resultCode) {
+    String btnTitle = "";
+
+    ProgressBar pb = (SID_1.equals(sId) ? pbS1 : pbS2);
+    Button btn = (SID_1.equals(sId) ? btnS1Signal : btnS2Signal);
+
+    pb.setVisibility(!isResponse ? View.VISIBLE : View.GONE);
+    if (resultCode == ResultCode.SUCCESS) {
+      if (state == ServerState.RUNNING) {
+        btnTitle = getString(R.string.stop_to_start);
+        state = ServerState.STOP;
+      }
+      else {
+        btnTitle = getString(R.string.running_to_stop);
+        state = ServerState.RUNNING;
       }
     }
-  }
-
-  public void showToast(String msg) {
-    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-  }
-
-  @Override
-  public void onResultRetrieveServerState(@NonNull ResultCode resultCode) {
-    if (resultCode == ResultCode.RUNNING) {
-      btnSignals.setText(getString(R.string.running_to_stop));
-      this.serverState = ServerState.RUNNING;
+    else if (resultCode == ResultCode.RUNNING) {
+      btnTitle = getString(R.string.running_to_stop);
+      state = ServerState.RUNNING;
     }
     else if (resultCode == ResultCode.STOP) {
-      btnSignals.setText(getString(R.string.stop_to_start));
-      this.serverState = ServerState.STOP;
+      btnTitle = getString(R.string.stop_to_start);
+      state = ServerState.STOP;
     }
-    else {
-      btnSignals.setText(getString(R.string.get_server_state));
-      this.serverState = ServerState.DISABLED;
-      showToast("failed to get server state.\nResult code is `" + resultCode.name() + "`");
+    if (resultCode == ResultCode.FAIL) {
+      Utils.showToast(this, "failed to get server [" + sId + "] state.\nResult code is `" + resultCode.name() + "`");
+      btnTitle = getString(R.string.get_server_state);
+      state = ServerState.DISABLED;
     }
-    btnSignals.setEnabled(true);
-    progressBar.setVisibility(View.INVISIBLE);
-    setText_ServerState(serverState);
-    Log.d(TAG, "// onResultRetrieveServerState() // result Code = " + resultCode.name());
+    if (resultCode == ResultCode.WAIT) {
+      // wait for response.
+      btnTitle = getString(R.string.send_signal);
+    }
+
+    if (SID_1.equals(sId)) {
+      s1State = state;
+    }
+    else if (SID_2.equals(sId)) {
+      s2State = state;
+    }
+    btn.setText(btnTitle);
+    btn.setEnabled(isResponse);
+    setText_ServerState(sId, state);
   }
 
   @Override
-  public void sendStartSignalCompleted(@NonNull ResultCode resultCode) {
-    if (resultCode == ResultCode.SUCCESS) {
-      this.serverState = ServerState.RUNNING;
-      btnSignals.setText(getString(R.string.running_to_stop));
-    }
-    else {
-      showToast("failed to send Start signal.\nResult code is `" + resultCode.name() + "`");
-    }
-    btnSignals.setEnabled(true);
-    progressBar.setVisibility(View.INVISIBLE);
-    setText_ServerState(serverState);
+  public void onResultRetrieveServerState(@NonNull String sId, @NonNull ResultCode resultCode) {
+    setButtonsLayouts(sId, (SID_1.equals(sId) ? s1State : s2State), true, resultCode);
   }
 
   @Override
-  public void sendStopSignalCompleted(@NonNull ResultCode resultCode) {
-    if (resultCode == ResultCode.SUCCESS) {
-      this.serverState = ServerState.STOP;
-      btnSignals.setText(getString(R.string.stop_to_start));
-    }
-    else {
-      showToast("failed to send Stop signal.\nResult code is `" + resultCode.name() + "`");
-    }
-    btnSignals.setEnabled(true);
-    progressBar.setVisibility(View.INVISIBLE);
-    setText_ServerState(serverState);
+  public void sendStartSignalCompleted(@NonNull String sId, @NonNull ResultCode resultCode) {
+    setButtonsLayouts(sId, (SID_1.equals(sId) ? s1State : s2State), true, resultCode);
+  }
+
+  @Override
+  public void sendStopSignalCompleted(@NonNull String sId, @NonNull ResultCode resultCode) {
+    setButtonsLayouts(sId, (SID_1.equals(sId) ? s1State : s2State), true, resultCode);
   }
 
   @Override
   public void onError(String tag, String message) {
     super.onError(tag, message);
 
-    showToast("an error occurred while network jobs. please re try.");
-    btnSignals.setEnabled(true);
-    progressBar.setVisibility(View.INVISIBLE);
-    setText_ServerState(null);    // error occur
+    Utils.showToast(this, "an error occurred while network jobs. please re try.");
+
+    if (SID_1.equals(tag) || SID_2.equals(tag)) {
+      setButtonsLayouts(tag, (SID_1.equals(tag) ? s1State : s2State), true, ResultCode.FAIL);
+    }
   }
 
-  private void setText_ServerState(ServerState state) {
+  private void setText_ServerState(@NonNull String sId, ServerState state) {
     final String oldText = tvState.getText().toString();
-    tvState.setText(String.valueOf(("Server State : " + (state.name() != null ? state.name() : "ERROR") + "\n") + oldText));
+    tvState.setText(String.valueOf(("[" + sId + "] State : " + (state.name() != null ? state.name() : "ERROR") + "\n") + oldText));
   }
 
 }
